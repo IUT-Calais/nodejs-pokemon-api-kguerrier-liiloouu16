@@ -52,27 +52,39 @@ export const postPokemon = async (req: Request, res: Response) => {
 };
 
 export const patchPokemonCardId = async (req: Request, res: Response) => {
-    const {pokemonCardId} = req.params;
-    const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
+  
+  const {pokemonCardId} = req.params;
+  const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
 
-    if (isNaN(Number(pokemonCardId))) {
-        res.status(400).send({ error: 'ID invalide' });
-    }
+  if (isNaN(Number(pokemonCardId))) {
+      res.status(400).send({ error: 'ID invalide' });
+  }
 
-    await prisma.pokemonCard.update({
-    where: { pokedexId: Number(pokemonCardId)},
-    data:{
-        name: name,
-        pokedexId: pokedexId ,
-        type: {connect: {id: typeId}} ,
-        lifePoints: lifePoints,
-        size: size ,
-        weight: weight ,
-        imageUrl: imageUrl
-    },
-    include: { type: true }
-    });
+  await prisma.pokemonCard.update({
+  where: { pokedexId: Number(pokemonCardId)},
+  data:{
+      name: name,
+      pokedexId: pokedexId ,
+      type: {connect: {id: typeId}} ,
+      lifePoints: lifePoints,
+      size: size ,
+      weight: weight ,
+      imageUrl: imageUrl
+  }});
 
-    res.status(200).send(name);
+  res.status(200).send(name);
+
+}
+
+export const deletePokemonId = async (req: Request, res: Response) => {
+  const {pokemonCardId} = req.params;
+  
+  if (isNaN(Number(pokemonCardId))) {
+    res.status(400).send({ error: 'ID invalide' });
+  }
+
+  await prisma.pokemonCard.delete({
+    where: { pokedexId: Number(pokemonCardId)}
+  });
 
 }
