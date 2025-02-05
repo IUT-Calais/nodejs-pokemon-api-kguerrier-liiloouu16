@@ -4,11 +4,11 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 }
 
 model Type {
-  id   Int    @id @default(autoincrement())
+  id Int @id @default(autoincrement())
   name String @unique
   PokemonCard PokemonCard[] @relation("pokemoncard_type")
 }
