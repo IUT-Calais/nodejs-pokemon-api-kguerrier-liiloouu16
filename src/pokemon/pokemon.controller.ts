@@ -17,7 +17,7 @@ export const getPokemonId =  async (req: Request, res: Response) => {
   }
 
   const pokemon = await prisma.pokemonCard.findUnique({
-    where: { id: Number(pokemonCardId)},
+    where: { pokedexId: Number(pokemonCardId)},
     include: { type: true },
   });
 
@@ -30,23 +30,44 @@ export const getPokemonId =  async (req: Request, res: Response) => {
 
 
 //enregistre un pokémon selon les propriétés dans le body
-export const postPokemon =  async (req: Request, res: Response) => {
+export const postPokemon = async (req: Request, res: Response) => {
 
-    
+  const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
 
+  await prisma.pokemonCard.create({
+    data:{
+      name: name,
+      pokedexId: pokedexId,
+      type: {connect: {id: typeId}},
+      lifePoints: lifePoints,
+      size: size,
+      weight: weight,
+      imageUrl: imageUrl
+    },
+    include: { type: true }
+    });
 
+  res.status(200).send(name);
 
-};
+// };
 
-// app.patch('/pokemon-cards/:pokemonCardId', (_req: Request, _res: Response) => {
-//   _res.status(200).send('Modification du pokemon');
-// });
+// export const patchPokemonCardId = async (req: Request, res: Response) => {
 
-// app.delete('/pokemon-cards/:pokemonCardId', (_req: Request, _res: Response) => {
-//   _res.status(200).send('Suppression du pokemon');
-// });
+//     const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
 
+//     await prisma.pokemonCard.create({
+//     data:{
+//       name: name,
+//       pokedexId: pokedexId ,
+//       type: {connect: {id: typeId}} ,
+//       lifePoints: lifePoints,
+//       size: size ,
+//       weight: weight ,
+//       imageUrl: imageUrl
+//     },
+//     include: { type: true }
+//     });
 
-// export function stopServer() {
-//   server.close();
+//   res.status(200).send(name);
+
 // }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getPokemon, getPokemonId, postPokemon } from "./pokemon.controller";
+import { getPokemon, getPokemonId, postPokemon, patchPokemonCardId} from "./pokemon.controller";
 
 export const pokemonRouter = Router();
 
@@ -7,3 +7,4 @@ export const pokemonRouter = Router();
 pokemonRouter.get('/', getPokemon);
 pokemonRouter.get('/:pokemonCardId', getPokemonId);
 pokemonRouter.post('/', postPokemon);
+pokemonRouter.patch('/', patchPokemonCardId);
