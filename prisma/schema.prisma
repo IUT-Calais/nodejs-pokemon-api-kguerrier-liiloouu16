@@ -10,14 +10,15 @@ datasource db {
 model Type {
   id   Int    @id @default(autoincrement())
   name String @unique
-  PokemonCard PokemonCard @relation(fields: [id], references: [id])
+  PokemonCard PokemonCard[] @relation("pokemoncard_type")
 }
 
 model PokemonCard {
   id Int  @id @default(autoincrement())
   name String @unique
   pokedexId Int @unique
-  type Type[]
+  type Type @relation(name: "pokemoncard_type", fields: [typeId], references: [id])
+  typeId Int
   lifePoints Int
   size Float?
   weight Float?
