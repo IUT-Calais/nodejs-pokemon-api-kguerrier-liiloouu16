@@ -7,4 +7,4 @@ export const pokemonRouter = Router();
 pokemonRouter.get('/', getPokemon);
 pokemonRouter.get('/:pokemonCardId', getPokemonId);
 pokemonRouter.post('/', postPokemon);
-pokemonRouter.patch('/', patchPokemonCardId);
+pokemonRouter.patch('/:pokemonCardId', patchPokemonCardId);

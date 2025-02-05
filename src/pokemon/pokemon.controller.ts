@@ -49,25 +49,30 @@ export const postPokemon = async (req: Request, res: Response) => {
 
   res.status(200).send(name);
 
-// };
+};
 
-// export const patchPokemonCardId = async (req: Request, res: Response) => {
+export const patchPokemonCardId = async (req: Request, res: Response) => {
+    const {pokemonCardId} = req.params;
+    const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
 
-//     const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
+    if (isNaN(Number(pokemonCardId))) {
+        res.status(400).send({ error: 'ID invalide' });
+    }
 
-//     await prisma.pokemonCard.create({
-//     data:{
-//       name: name,
-//       pokedexId: pokedexId ,
-//       type: {connect: {id: typeId}} ,
-//       lifePoints: lifePoints,
-//       size: size ,
-//       weight: weight ,
-//       imageUrl: imageUrl
-//     },
-//     include: { type: true }
-//     });
+    await prisma.pokemonCard.update({
+    where: { pokedexId: Number(pokemonCardId)},
+    data:{
+        name: name,
+        pokedexId: pokedexId ,
+        type: {connect: {id: typeId}} ,
+        lifePoints: lifePoints,
+        size: size ,
+        weight: weight ,
+        imageUrl: imageUrl
+    },
+    include: { type: true }
+    });
 
-//   res.status(200).send(name);
+    res.status(200).send(name);
 
-// }
+}
