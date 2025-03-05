@@ -6,14 +6,16 @@ import prisma from '../client';
 export const getPokemon =  async (req: Request, res: Response) => {
     const pokemons = await prisma.pokemonCard.findMany({ include: { type: true } });
     res.status(200).send(pokemons);
+    return;
 };
 
-// affiche un pokemon selon son id
+//affiche un pokemon selon son id
 export const getPokemonId =  async (req: Request, res: Response) => {
   const {pokemonCardId} = req.params;
 
   if (isNaN(Number(pokemonCardId))) {
     res.status(400).send({ error: 'ID invalide' });
+    return;
   }
 
   const pokemon = await prisma.pokemonCard.findUnique({
@@ -21,13 +23,13 @@ export const getPokemonId =  async (req: Request, res: Response) => {
     include: { type: true },
   });
 
-  if (!pokemon) {
+  if(!pokemon){
     res.status(404).send({ error: 'Pokemon non trouvé' });
+    return;
   }
 
   res.status(200).send(pokemon);
 };
-
 
 //enregistre un pokémon selon les propriétés dans le body
 export const postPokemon = async (req: Request, res: Response) => {
@@ -47,10 +49,11 @@ export const postPokemon = async (req: Request, res: Response) => {
     include: { type: true }
     });
 
-  res.status(200).send(name);
+  res.status(201).send(name + ' enregistré');
 
 };
 
+//modifie le pokemon selon son id
 export const patchPokemonCardId = async (req: Request, res: Response) => {
   
   const {pokemonCardId} = req.params;
@@ -60,21 +63,28 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
       res.status(400).send({ error: 'ID invalide' });
   }
 
-  await prisma.pokemonCard.update({
-  where: { pokedexId: Number(pokemonCardId)},
-  data:{
-      name: name,
-      pokedexId: pokedexId ,
-      type: {connect: {id: typeId}} ,
-      lifePoints: lifePoints,
-      size: size ,
-      weight: weight ,
-      imageUrl: imageUrl
-  }});
+  try{
+    const pokemon = await prisma.pokemonCard.update({
+    where: { pokedexId: Number(pokemonCardId)},
+    data:{
+        name: name,
+        pokedexId: pokedexId ,
+        type: {connect: {id: typeId}} ,
+        lifePoints: lifePoints,
+        size: size ,
+        weight: weight ,
+        imageUrl: imageUrl
+    }});
+  }catch (error){
+    res.status(404).send({ error: 'Pokemon non trouvé' });
+    return;
+  }
 
-  res.status(200).send(name);
+  res.status(200).send(name + ' modifié');
 
 }
+
+
 
 export const deletePokemonId = async (req: Request, res: Response) => {
   const {pokemonCardId} = req.params;
@@ -87,4 +97,5 @@ export const deletePokemonId = async (req: Request, res: Response) => {
     where: { pokedexId: Number(pokemonCardId)}
   });
 
+  res.status(200).send('Pokemon supprimé');
 }
