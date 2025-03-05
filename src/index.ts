@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 //middleware
 app.use(express.json());
 app.use('/pokemons-cards', pokemonRouter);
-app.use('/user', userRouter);
+app.use('/users', userRouter);
 
 
 export const server = app.listen(port);

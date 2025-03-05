@@ -29,6 +29,7 @@ export const getPokemonId =  async (req: Request, res: Response) => {
   }
 
   res.status(200).send(pokemon);
+  return;
 };
 
 //enregistre un pokémon selon les propriétés dans le body
@@ -66,6 +67,7 @@ export const postPokemon = async (req: Request, res: Response) => {
     });
 
   res.status(201).send(name + ' enregistré');
+  return;
 
 };
 
@@ -97,10 +99,9 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
   }
 
   res.status(200).send(name + ' modifié');
+  return;
 
 }
-
-
 
 export const deletePokemonId = async (req: Request, res: Response) => {
   const {pokemonCardId} = req.params;
@@ -114,4 +115,5 @@ export const deletePokemonId = async (req: Request, res: Response) => {
   });
 
   res.status(200).send('Pokemon supprimé');
+  return;
 }

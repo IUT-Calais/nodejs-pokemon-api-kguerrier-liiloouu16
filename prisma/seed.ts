@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   //suppression de tous les posts (voir pages 29 du cours)
   await prisma.pokemonCard.deleteMany();
+  await prisma.user.deleteMany();
   await prisma.type.deleteMany();
   await prisma.type.createMany({
     data: [
@@ -60,6 +61,13 @@ async function main() {
       weight: 7 ,
       imageUrl: "https://www.pokepedia.fr/images/thumb/8/83/Nymphali-XY.png/800px-Nymphali-XY.png" 
     },
+  });
+
+  await prisma.user.create({
+    data:{
+      email: "admin@gmail.com",
+      password: "admin"
+    }
   });
 
   console.log('Seed completed!');
