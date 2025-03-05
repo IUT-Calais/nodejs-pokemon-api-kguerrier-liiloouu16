@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../client';
+import bcrypt from 'bcrypt';
 
 
 //liste tous les users
@@ -29,14 +30,18 @@ export const postUser = async (req: Request, res: Response) => {
       res.status(400).send({ error: 'Utilisateur déjà existant' });
       return;
     }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
   
     await prisma.user.create({
       data:{
         email: email,
-        password: password
+        password: hashedPassword,
       }
       });
   
+
     res.status(201).send('Utilisateur ' + email + ' enregistré');
     return;
   
@@ -53,13 +58,20 @@ export const postUserLogin = async (req: Request, res: Response) => {
     }
   
     const user = await prisma.user.findFirst({
-      where: {
-        AND: [{ email: email }, { password: password }],
-      },
+      where: { email: email },
     });
-  
+    
     if(!user){
       res.status(404).send({ error: 'Utilisateur non trouvé' });
+      return;
+    }
+
+    const decryptedPassword = await bcrypt.compare(password, user.password);
+  
+
+    //comparer le mot de passe
+    if(!decryptedPassword){
+      res.status(401).send({ error: 'Mot de passe incorrect' });
       return;
     }
   
