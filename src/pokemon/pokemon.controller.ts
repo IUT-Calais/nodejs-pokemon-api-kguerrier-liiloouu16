@@ -36,6 +36,22 @@ export const postPokemon = async (req: Request, res: Response) => {
 
   const {name, pokedexId, typeId, lifePoints, size, weight, imageUrl} = req.body;
 
+  if (!name || !pokedexId || !typeId || !lifePoints || !size || !weight || !imageUrl) {
+    res.status(400).send({ error: 'Propriétés manquantes : Veuillez renseigner tous les champs' });
+    return;
+  }
+
+  const existPokemon = await prisma.pokemonCard.findFirst({
+    where: {
+      OR: [{ name: name }, { pokedexId: pokedexId }],
+    },
+  });
+
+  if(existPokemon){
+    res.status(400).send({ error: 'Pokemon déjà existant' });
+    return;
+  }
+
   await prisma.pokemonCard.create({
     data:{
       name: name,
@@ -64,7 +80,7 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
   }
 
   try{
-    const pokemon = await prisma.pokemonCard.update({
+    await prisma.pokemonCard.update({
     where: { pokedexId: Number(pokemonCardId)},
     data:{
         name: name,
@@ -76,7 +92,7 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
         imageUrl: imageUrl
     }});
   }catch (error){
-    res.status(404).send({ error: 'Pokemon non trouvé' });
+    res.status(400).send({ error: 'Pokemon non trouvé' });
     return;
   }
 
