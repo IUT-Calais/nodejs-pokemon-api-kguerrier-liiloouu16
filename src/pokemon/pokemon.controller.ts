@@ -53,7 +53,7 @@ export const postPokemon = async (req: Request, res: Response) => {
 
 };
 
-//modifie le pokemon selon son id
+//modifie le pokemon selon son id 
 export const patchPokemonCardId = async (req: Request, res: Response) => {
   
   const {pokemonCardId} = req.params;
