@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../client';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 
 //liste tous les users
@@ -67,16 +68,30 @@ export const postUserLogin = async (req: Request, res: Response) => {
     }
 
     const decryptedPassword = await bcrypt.compare(password, user.password);
-  
 
     //comparer le mot de passe
     if(!decryptedPassword){
-      res.status(401).send({ error: 'Mot de passe incorrect' });
+      res.status(400).send({ error: 'Mot de passe incorrect' });
       return;
     }
-  
-    res.status(200).send('Bienvenue ' + email);
-    return;
+
+    //générer un token
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET as string,
+      {
+        //expiresIn: process.env.JWT_EXPIRES_IN,
+        expiresIn: '1h',
+      }
+    );
+
+    res.status(201).json({
+      message:'Connexion réussie, bienvenue ' + email,
+      token: token,
+    });
   
 };
 

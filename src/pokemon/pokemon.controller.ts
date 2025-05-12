@@ -103,6 +103,7 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
 
 }
 
+//supprime le pokemon selon son id
 export const deletePokemonId = async (req: Request, res: Response) => {
   const {pokemonCardId} = req.params;
   

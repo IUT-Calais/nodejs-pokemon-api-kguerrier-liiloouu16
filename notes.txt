@@ -1,0 +1,24 @@
+1. lancé le commande prompt de node et cd dans le repertoire git et ensuite fait npm ci pour télécharger les dépendances de package-lock.json
+
+2. j'ai fait la commande: npm run db:migrate
+pour initialiser la base de données
+
+3. j'ai fait la commande: npm run db:seed
+pour initialiser la base de données de test
+
+4. regénérer le fichier prisma/client : npx prisma generate
+
+5. lancer le serveur avec npm run dev
+
+
+
+
+une fois que j'ai créé mon modèle alors je créer une migration avec la commande : npx prisma migrate dev --name init
+(d'apres le cours à l'oral)
+
+
+
+mettre a jour une fois prisma modifié:
+npm db:reset
+npm db:migrate
+npm db:generate
