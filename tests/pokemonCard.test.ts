@@ -16,6 +16,7 @@ describe('PokemonCard API', () => {
       expect(response.status).toBe(200);
       expect(response.body).toEqual(allPokemonCards);
     });
+    
   });
 
 
@@ -48,6 +49,7 @@ describe('PokemonCard API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({ error: 'ID invalide' });
     });
+
   });
 
 
@@ -76,7 +78,7 @@ describe('PokemonCard API', () => {
         .send(incompleteData);
 
       expect(response.status).toBe(400);
-      expect(response.body).toEqual('Propriétés manquantes : Veuillez renseigner tous les champs');
+      expect(response.body).toEqual({error: 'Propriétés manquantes : Veuillez renseigner tous les champs'});
     });
 
     //test pokemon déjà existant
@@ -91,6 +93,7 @@ describe('PokemonCard API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({ error: 'Pokemon déjà existant' });
     });
+
   });
 
 
@@ -133,6 +136,7 @@ describe('PokemonCard API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({ error: 'Pokemon non trouvé' });
     });
+
   });
 
   //delete a PokemonCard
@@ -158,5 +162,7 @@ describe('PokemonCard API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({ error: 'ID invalide' });
     });
+
   });
+
 });
