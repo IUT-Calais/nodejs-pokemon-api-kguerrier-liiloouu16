@@ -97,7 +97,7 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
     return;
 
   }catch (error){
-    res.status(400).send({ error: 'Pokemon non trouvé' });
+    res.status(404).send({ error: 'Pokemon non trouvé' });
     return;
   }
 }

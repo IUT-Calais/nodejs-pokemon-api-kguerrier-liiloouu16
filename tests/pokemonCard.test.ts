@@ -133,7 +133,7 @@ describe('PokemonCard API', () => {
         .set('Authorization', 'Bearer mockedToken')
         .send(updatedPokemonCard);
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(404);
       expect(response.body).toEqual({ error: 'Pokemon non trouvé' });
     });
 
