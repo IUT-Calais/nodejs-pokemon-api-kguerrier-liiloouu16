@@ -1,37 +1,212 @@
 openapi: 3.0.0
 info:
-  title: Prisma User API
+  title: Doc User API Pokemon
   version: 1.0.0
-  description: API pour gérer les utilisateurs et leurs posts
+  description: API pour gérer les utilisateurs et leur pokemons 🐦‍🔥
 servers:
   - url: http://localhost:3000
     description: Serveur local
+tags:
+  - name: 🦊 Pokemon
+    description: Info API Pokémon
+  - name: 👩‍💻 User
+    description: Info API utilisateurs
 
 paths:
-    /users:
+  /pokemons-cards:
     get:
-      summary: Récupère la liste de tous les utilisateurs
+      tags:
+        - 🦊 Pokemon
+      summary: Liste tous les pokémons
       responses:
         '200':
-          description: Liste des utilisateurs récupérée avec succès
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
+          description: Liste des pokémons
     post:
+      tags:
+        - 🦊 Pokemon
+      summary: Crée un nouveau pokémon
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - pokedexId
+                - typeId
+                - lifePoints
+                - size
+                - weight
+                - imageUrl
+              properties:
+                name:
+                  type: string
+                pokedexId:
+                  type: integer
+                typeId:
+                  type: integer
+                lifePoints:
+                  type: integer
+                size:
+                  type: number
+                weight:
+                  type: number
+                imageUrl:
+                  type: string
+      responses:
+        '201':
+          description: Pokémon créé
+        '400':
+          description: Propriétés manquantes ou pokémon déjà existant
+
+  /pokemons-cards/{pokemonCardId}:
+    get:
+      tags:
+        - 🦊 Pokemon
+      summary: Récupère un pokémon grâce à son ID
+      parameters:
+        - in: path
+          name: pokemonCardId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pokémon trouvé
+        '400':
+          description: ID invalide
+        '404':
+          description: Pokémon non trouvé
+
+    patch:
+      tags:
+        - 🦊 Pokemon
+      summary: Met à jour un pokémon
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: pokemonCardId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                pokedexId:
+                  type: integer
+                typeId:
+                  type: integer
+                lifePoints:
+                  type: integer
+                size:
+                  type: number
+                weight:
+                  type: number
+                imageUrl:
+                  type: string
+      responses:
+        '200':
+          description: Pokémon mis à jour
+        '400':
+          description: ID invalide
+        '404':
+          description: Pokemon non trouvé
+
+    delete:  
+      tags:
+        - 🦊 Pokemon
+      summary: Supprime un pokémon
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: pokemonCardId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Pokémon supprimé
+        '400':
+          description: ID invalide
+ 
+  /users:
+    get:
+      tags:
+        - 👩‍💻 User
+      summary: Liste tous les utilisateurs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Liste des utilisateurs
+
+    post:  
+      tags:
+        - 👩‍💻 User
       summary: Crée un nouvel utilisateur
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
       responses:
         '201':
-          description: Utilisateur créé avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+          description: Utilisateur créé
+        '400':
+          description: Propriétés manquantes ou utilisateur déjà existant
+
+  /users/login:
+    post:  
+      tags:
+        - 👩‍💻 User
+      summary: Authentifie un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Authentification réussie, retourne un token JWT
+        '400':
+          description: Email ou mot de passe incorrect ou manquant
+        '404':
+          description: Utilisateur non trouvé
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
