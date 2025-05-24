@@ -10,5 +10,8 @@ app.use(express.json());
 app.use('/pokemons-cards', pokemonRouter);
 app.use('/users', userRouter);
 
+export function stopServer() {
+    server.close();
+}
 
 export const server = app.listen(port);

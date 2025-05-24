@@ -53,7 +53,7 @@ export const postPokemon = async (req: Request, res: Response) => {
     return;
   }
 
-  await prisma.pokemonCard.create({
+  const newpokemon = await prisma.pokemonCard.create({
     data:{
       name: name,
       pokedexId: pokedexId,
@@ -66,9 +66,8 @@ export const postPokemon = async (req: Request, res: Response) => {
     include: { type: true }
     });
 
-  res.status(201).send(name + ' enregistré');
+  res.status(201).send(newpokemon);
   return;
-
 };
 
 //modifie le pokemon selon son id 
@@ -79,10 +78,11 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
 
   if (isNaN(Number(pokemonCardId))) {
       res.status(400).send({ error: 'ID invalide' });
+      return;
   }
 
   try{
-    await prisma.pokemonCard.update({
+    const updatedpokemon = await prisma.pokemonCard.update({
     where: { pokedexId: Number(pokemonCardId)},
     data:{
         name: name,
@@ -93,14 +93,13 @@ export const patchPokemonCardId = async (req: Request, res: Response) => {
         weight: weight ,
         imageUrl: imageUrl
     }});
+    res.status(200).send(updatedpokemon);
+    return;
+
   }catch (error){
     res.status(400).send({ error: 'Pokemon non trouvé' });
     return;
   }
-
-  res.status(200).send(name + ' modifié');
-  return;
-
 }
 
 //supprime le pokemon selon son id
@@ -109,6 +108,7 @@ export const deletePokemonId = async (req: Request, res: Response) => {
   
   if (isNaN(Number(pokemonCardId))) {
     res.status(400).send({ error: 'ID invalide' });
+    return;
   }
 
   await prisma.pokemonCard.delete({
