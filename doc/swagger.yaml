@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: Prisma User API
+  version: 1.0.0
+  description: API pour gérer les utilisateurs et leurs posts
+servers:
+  - url: http://localhost:3000
+    description: Serveur local
+
+paths:
+    /users:
+    get:
+      summary: Récupère la liste de tous les utilisateurs
+      responses:
+        '200':
+          description: Liste des utilisateurs récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Crée un nouvel utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Utilisateur créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
