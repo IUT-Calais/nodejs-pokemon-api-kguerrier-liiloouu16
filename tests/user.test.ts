@@ -228,16 +228,19 @@ describe('User API', () => {
     //test delete ok
     it('should delete a user', async () => {
       const mockUser = { id: 1, email: 'test@gmail.com', password: 'hashedpassword' };
+      jest.spyOn(jwt, 'verify').mockReturnValue({id: 1, email: 'test@gmail.com'} as any);
+      prismaMock.user.findUnique.mockResolvedValue(mockUser);
       prismaMock.user.delete.mockResolvedValue(mockUser);
       const response = await request(app)
         .delete('/users/1')
         .set('Authorization', 'Bearer mockedToken');
-      
+
       expect(response.status).toBe(200);
+      expect(response.text).toBe('User supprimé');
     });
 
     //test ID invalide
-    it('hould return 400 if ID is invalid', async () => {
+    it('should return 400 if ID is invalid', async () => {
       const response = await request(app)
         .delete('/users/char')
         .set('Authorization', 'Bearer mockedToken');
@@ -245,7 +248,31 @@ describe('User API', () => {
       expect(response.status).toBe(400);
       expect(response.body).toEqual({ error: 'ID invalide' });
     });
-    
+
+    //test user not found
+    it('should return 404 if user does not exist', async () => {
+      jest.spyOn(jwt, 'verify').mockReturnValue({id: 1, email: 'test@gmail.com'} as any);
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      const response = await request(app)
+        .delete('/users/1')
+        .set('Authorization', 'Bearer mockedToken');
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'Utilisateur non trouvé' });
+    });
+
+    //test deleting another account
+    it('should return 403 if user tries to delete another user', async () => {
+      jest.spyOn(jwt, 'verify').mockReturnValue({id: 1, email: 'test@gmail.com'} as any);
+      prismaMock.user.findUnique.mockResolvedValue({id: 2,email: 'other@gmail.com',password: 'hashedpassword'});
+      const response = await request(app)
+        .delete('/users/2')
+        .set('Authorization', 'Bearer mockedToken');
+
+      expect(response.status).toBe(403);
+      expect(response.body).toEqual({ error: "Accès interdit : ce n’est pas votre compte" });
+    });
   });
+
 
 });
