@@ -11,6 +11,28 @@ export const getUser =  async (req: Request, res: Response) => {
     return;
 };
 
+// affiche un user selon son id
+export const getUserId =  async (req: Request, res: Response) => {
+  const {userId} = req.params;
+
+  if (isNaN(Number(userId))) {
+    res.status(400).send({ error: 'ID invalide' });
+    return; 
+  }
+
+  const existuserId = await prisma.user.findUnique({
+    where: { id: Number(userId)}
+  });
+
+  if(!existuserId){
+    res.status(404).send({ error: 'Utilisateur non trouvé' });
+    return;
+  }
+
+  res.status(200).send(existuserId);
+  return;
+};
+
 //enregistre un user selon les propriétés dans le body
 export const postUser = async (req: Request, res: Response) => {
 
@@ -95,3 +117,75 @@ export const postUserLogin = async (req: Request, res: Response) => {
   
 };
 
+
+//modifie le user selon son id 
+export const patchUserId = async (req: Request, res: Response) => {
+  
+  const {userId} = req.params;
+  const {email, password} = req.body;
+
+  if (isNaN(Number(userId))) {
+    res.status(400).send({ error: 'ID invalide' });
+    return;
+  }
+
+  const existUser = await prisma.user.findUnique({
+    where: { id: Number(userId)}
+  });
+  
+  if(!existUser){
+    res.status(404).send({ error: 'Utilisateur non trouvé' });
+    return;
+  }
+  
+  //user connecté correspond à l'id de la req ?
+  if ((req as any).user.id !== Number(userId)) {
+    res.status(403).send({ error: "Accès interdit : ce n’est pas votre compte" });
+    return;
+  }
+
+  const saltRounds = 10;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  const updatedUser = await prisma.user.update({
+  where: { id: Number(userId)},
+  data:{
+      email: email,
+      password: hashedPassword
+  }});
+  res.status(200).send(updatedUser);
+  return;
+    
+}
+
+
+
+
+
+//supprimer un user selon son id
+export const deleteUserId = async (req: Request, res: Response) => {
+  const {userId} = req.params;
+  
+  if (isNaN(Number(userId))) {
+    res.status(400).send({ error: 'ID invalide' });
+    return;
+  }
+
+  const existUser = await prisma.user.findUnique({
+    where: { id: Number(userId)}
+  });
+  
+  if(!existUser){
+    res.status(404).send({ error: 'Utilisateur non trouvé' });
+    return;
+  }
+  
+  //user connecté correspond à l'id de la req ?
+  if ((req as any).user.id !== Number(userId)) {
+    res.status(403).send({ error: "Accès interdit : ce n’est pas votre compte" });
+    return;
+  }
+
+  await prisma.user.delete({ where: { id: Number(userId) } });
+  res.status(200).send('User supprimé');
+  return;
+}

@@ -19,6 +19,39 @@ describe('User API', () => {
     });
   });
 
+
+  //fetch a user by id
+    describe('GET /users/:userId', () => {
+  
+      //test correct
+      it('should fetch a user by ID', async () => {
+        const userId = {id: 123, email: 'test@gmail.com', password:'hashedPassword'};
+        prismaMock.user.findUnique.mockResolvedValue(userId);
+        const response = await request(app).get('/users/1');
+  
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(userId);
+      });
+  
+      //test user non trouvé
+      it('should return 404 if the user is not found', async () => {
+        const userId = null;
+        prismaMock.user.findUnique.mockResolvedValue(userId);
+        const response = await request(app).get('/users/999');
+  
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({ error: 'Utilisateur non trouvé' });
+      });
+  
+      //test ID invalide
+      it('should return 400 if ID is invalid', async () => {
+        const response = await request(app).get('/users/char');
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({ error: 'ID invalide' });
+      });
+  
+    });
+
   //create a user
   describe('POST /users', () => {
 
@@ -122,6 +155,97 @@ describe('User API', () => {
       jest.restoreAllMocks();
     });
 
+  });
+
+  //update a user
+  describe('PATCH /users/:userId', () => {
+    
+    const updatedUser = {id: 1, email: 'test@gmail.com', password: 'hashedpassword'};
+    
+    //test update ok
+    it('should update an existing user', async () => {
+      const userId = 1;
+      const updatedUser = { id: userId, email: 'test@gmail.com', password: 'hashedpassword' };
+      prismaMock.user.findUnique.mockResolvedValue({ id: userId, email: 'old@gmail.com', password: 'oldhashed' });
+      prismaMock.user.update.mockResolvedValue(updatedUser);
+      const jwtSpy = jest.spyOn(jwt, 'verify').mockReturnValue({id: userId, email: 'test@gmail.com'} as any);
+      const response = await request(app)
+        .patch(`/users/${userId}`)
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updatedUser);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(updatedUser);
+
+      jwtSpy.mockRestore();
+    });
+
+    //test ID invalide
+    it('should return 400 if ID is invalid', async () => {
+      const response = await request(app)
+        .patch('/users/char')
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updatedUser);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'ID invalide' });
+    });
+
+    //test utilisateur non trouvé
+    it('should return 400 if the user is not found', async () => {
+      prismaMock.user.update.mockRejectedValue(new Error('Utilisateur non trouvé'));
+      const response = await request(app)
+        .patch('/users/999')
+        .set('Authorization', 'Bearer mockedToken')
+        .send(updatedUser);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'Utilisateur non trouvé' });
+    });
+
+    //test si user n'est pas connecté au bon compte
+    it('should return 403 if user tries to update another user', async () => {
+      jest.spyOn(jwt, 'verify').mockReturnValue({id: 1, email: 'test@gmail.com',} as any);
+      prismaMock.user.findUnique.mockResolvedValue({
+        id: 2,
+        email: 'other@gmail.com',
+        password: 'hashed',
+      });
+      const response = await request(app)
+        .patch('/users/2')
+        .set('Authorization', `Bearer faketoken`)
+        .send({ email: 'new@gmail.com' });
+
+      expect(response.status).toBe(403);
+      expect(response.body.error).toBe("Accès interdit : ce n’est pas votre compte");
+    });
+
+  });
+
+  //delete a user
+  describe('DELETE /users/:userId', () => {
+
+    //test delete ok
+    it('should delete a user', async () => {
+      const mockUser = { id: 1, email: 'test@gmail.com', password: 'hashedpassword' };
+      prismaMock.user.delete.mockResolvedValue(mockUser);
+      const response = await request(app)
+        .delete('/users/1')
+        .set('Authorization', 'Bearer mockedToken');
+      
+      expect(response.status).toBe(200);
+    });
+
+    //test ID invalide
+    it('hould return 400 if ID is invalid', async () => {
+      const response = await request(app)
+        .delete('/users/char')
+        .set('Authorization', 'Bearer mockedToken');
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error: 'ID invalide' });
+    });
+    
   });
 
 });

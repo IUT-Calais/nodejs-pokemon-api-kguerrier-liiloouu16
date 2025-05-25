@@ -1,15 +1,15 @@
 openapi: 3.0.0
 info:
-  title: Doc User API Pokemon
+  title: Doc User API Pokemon 🐦‍🔥
   version: 1.0.0
-  description: API pour gérer les utilisateurs et leur pokemons 🐦‍🔥
+  description: API pour gérer les utilisateurs et leur pokemons 
 servers:
   - url: http://localhost:3000
     description: Serveur local
 tags:
   - name: 🦊 Pokemon
     description: Info API Pokémon
-  - name: 👩‍💻 User
+  - name: 👩‍💻 Utilisateur
     description: Info API utilisateurs
 
 paths:
@@ -139,11 +139,14 @@ paths:
           description: Pokémon supprimé
         '400':
           description: ID invalide
- 
+
+
+
+
   /users:
     get:
       tags:
-        - 👩‍💻 User
+        - 👩‍💻 Utilisateur
       summary: Liste tous les utilisateurs
       security:
         - bearerAuth: []
@@ -153,7 +156,7 @@ paths:
 
     post:  
       tags:
-        - 👩‍💻 User
+        - 👩‍💻 Utilisateur
       summary: Crée un nouvel utilisateur
       requestBody:
         required: true
@@ -176,10 +179,83 @@ paths:
         '400':
           description: Propriétés manquantes ou utilisateur déjà existant
 
+  /users/{userId}:
+    get:
+      tags:
+        - 👩‍💻 Utilisateur
+      summary: Récupère un user grâce à son ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User trouvé
+        '400':
+          description: ID invalide
+        '404':
+          description: User non trouvé
+    delete:  
+      tags:
+        - 👩‍💻 Utilisateur
+      summary: Supprime un Utilisateur (après authentification au compte correspondant)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Utilisateur supprimé
+        '400':
+          description: ID invalide
+        '404':
+          description: Utilisateur non trouvé
+        '403':
+          description: Accès interdit veuillez vous connecter au compte correspondant pour le supprimer
+
+    patch:
+      tags:
+        - 👩‍💻 Utilisateur
+      summary: Met à jour un utilisateur
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Utilisateur mis à jour
+        '400':
+          description: ID invalide
+        '404':
+          description: Utilisateur non trouvé
+        '403':
+          description: Accès interdit veuillez vous connecter au compte correspondant pour le modifier
+
   /users/login:
     post:  
       tags:
-        - 👩‍💻 User
+        - 👩‍💻 Utilisateur
       summary: Authentifie un utilisateur
       requestBody:
         required: true
@@ -203,6 +279,8 @@ paths:
           description: Email ou mot de passe incorrect ou manquant
         '404':
           description: Utilisateur non trouvé
+
+
 
 components:
   securitySchemes:
